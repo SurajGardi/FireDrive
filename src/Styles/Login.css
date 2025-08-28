@@ -1,0 +1,103 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('src\Styles\R.png') no-repeat center center fixed;
+  background-size: cover;
+  padding: 20px;
+}
+
+
+.auth-box {
+  /* background: rgba(255, 255, 255, 0.1); Very transparent */
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 2rem;
+  width: 400px; /* Fixed width for square shape */
+  height: 400px; /* Fixed height for square shape */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-box h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  background: linear-gradient(to right, #ff69b4, #1e90ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem; /* Reduced for better fit in square */
+}
+
+.auth-box label {
+  text-align: left;
+  color: #202124;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.auth-box input {
+  padding: 0.6rem; /* Slightly smaller inputs */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: rgba(241, 243, 244, 0.7);
+}
+
+.auth-box input:focus {
+  outline: none;
+  border-color: #FFCA28;
+  box-shadow: 0 0 8px rgba(255, 202, 40, 0.3);
+}
+
+.auth-box button {
+  background: linear-gradient(90deg, #ff69b4, #1e90ff);
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.auth-box button:disabled {
+  background: linear-gradient(90deg, #FFECB3, #BBDEFB);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-box p {
+  margin-top: 1.5rem;
+  color: #202124;
+  font-size: 0.9rem;
+}
+
+.auth-box p a {
+  color: #112290;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.auth-box p a:hover {
+  color: #e23ad1;
+  text-decoration: underline;
+}

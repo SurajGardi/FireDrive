@@ -1,0 +1,172 @@
+.auth-container {
+  display: flex;
+  justify-content: flex-start; /* Form on the left */
+  align-items: center;
+  min-height: 100vh;
+  background: url('D:\Projects\FireDriveBySara\src\Styles\R.png') no-repeat center center fixed;
+  background-size: cover;
+  padding: 20px;
+}
+
+.auth-box {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(245, 245, 245, 0.9)); /* Subtle gradient background */
+  backdrop-filter: blur(5px); /* Reduced blur for clarity */
+  border-radius: 10px;
+  padding: 2rem;
+  width: 350px; /* Matching reference width */
+  height: 400px; /* Reduced height */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content */
+  justify-content: center;
+  margin-left: 300px; /* Space from left edge */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* User icon at the top */
+.auth-box .user-icon {
+  width: 60px;
+  height: 60px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Placeholder for user icon (replace with actual image or SVG) */
+.auth-box .user-icon::before {
+  content: "👤"; /* Unicode for user icon, replace with actual image if available */
+  font-size: 1.5rem;
+  color: #4a90e2;
+}
+
+.auth-box h2 {
+  color: #333333; /* Darker text for contrast */
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.8rem;
+  text-align: center;
+  text-shadow: none;
+}
+
+.auth-box label {
+  display: none; /* Hidden labels, implied by input placeholders in reference */
+}
+
+.auth-box input {
+  padding: 0.8rem 1rem; /* More padding for horizontal look */
+  border: none;
+  border-bottom: 2px solid #4a90e2; /* Bottom border for reference style */
+  border-radius: 0; /* No rounding for flat look */
+  font-size: 1rem;
+  background: transparent; /* Transparent background */
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1.2rem; /* Space between inputs */
+  transition: all 0.3s ease;
+}
+
+.auth-box input:focus {
+  outline: none;
+  border-bottom-color: #357abd; /* Darker blue on focus */
+  box-shadow: none; /* Remove shadow for flat design */
+}
+
+/* Input icons (simulated with ::after) */
+.auth-box input[type="text"]::after {
+  content: "👤"; /* User icon, replace with actual image if available */
+  position: absolute;
+  right: 10px;
+  color: #4a90e2;
+}
+
+.auth-box input[type="password"]::after {
+  content: "🔒"; /* Lock icon, replace with actual image if available */
+  position: absolute;
+  right: 10px;
+  color: #4a90e2;
+}
+
+/* Adjust positioning for icons (may need JavaScript for precise placement) */
+.auth-box input {
+  position: relative;
+  padding-right: 2.5rem; /* Space for icon */
+}
+
+.auth-box button {
+  background: linear-gradient(90deg, #4a90e2, #6bb9f0); /* Blue gradient */
+  color: #ffffff;
+  padding: 0.5rem; /* Reduced padding */
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem; /* Reduced font size */
+  font-weight: 500;
+  cursor: pointer;
+  margin: 1rem auto 1.5rem; /* Adjusted for more space below */
+  width: 100%; /* Reduced width */
+  transition: all 0.3s ease;
+}
+
+.auth-box button:hover {
+  background: linear-gradient(90deg, #357abd, #5a9fd4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.auth-box button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Additional options below button */
+.auth-box .options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.8rem; /* Adjusted spacing */
+  width: 100%;
+}
+
+.auth-box .options span {
+  color: #333333;
+  font-size: 0.9rem;
+}
+
+.auth-box .options a {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-box .options a:hover {
+  text-decoration: underline;
+  color: #357abd;
+}
+
+/* Create account link */
+.auth-box .create-account {
+  margin-top: 1rem; /* Adjusted spacing */
+  text-align: center;
+}
+
+.auth-box .create-account a {
+  color: #4a90e2;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-box .create-account a:hover {
+  text-decoration: underline;
+  color: #357abd;
+}
