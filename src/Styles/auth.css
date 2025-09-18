@@ -1,11 +1,38 @@
 .auth-container {
   display: flex;
-  justify-content: flex-start; /* Form on the left */
-  align-items: center;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
   min-height: 100vh;
-  background: url('D:\Projects\FireDriveBySara\src\Styles\R.png') no-repeat center center fixed;
-  background-size: cover;
-  padding: 20px;
+  background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 50%, #c7d2fe 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating SVG shapes for modern look */
+.auth-container .bg-shape {
+  position: absolute;
+  z-index: 0;
+  opacity: 0.18;
+  filter: blur(2px);
+}
+.auth-container .bg-shape1 {
+  top: -80px;
+  left: -80px;
+  width: 260px;
+  height: 260px;
+}
+.auth-container .bg-shape2 {
+  bottom: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+}
+.auth-container .bg-shape3 {
+  top: 40%;
+  left: 60%;
+  width: 120px;
+  height: 120px;
+  opacity: 0.12;
 }
 
 .auth-box {
@@ -21,8 +48,10 @@
   flex-direction: column;
   align-items: center; /* Center content */
   justify-content: center;
-  margin-left: 300px; /* Space from left edge */
+  margin: 0; /* Remove left margin for perfect centering */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .auth-box:hover {

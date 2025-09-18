@@ -9,7 +9,24 @@ import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "../Styles/Dashboard.css"
 import { FileIcon, defaultStyles } from "react-file-icon"
-import { FiSearch, FiUploadCloud, FiGrid, FiList, FiLogOut, FiBell, FiUser, FiSliders, FiCloud, FiFolder } from "react-icons/fi"
+import { FiSearch, FiUploadCloud, FiGrid, FiList, FiLogOut, FiBell, FiUser, FiSliders, FiCloud, FiFolder, FiMoreVertical, FiStar, FiTrash2, FiDownload, FiShare2 } from "react-icons/fi"
+  const handleDownload = (file) => {
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+const handleShare = async (file) => {
+  try {
+    await navigator.clipboard.writeText(file.url);
+    toast.success('File link copied!');
+  } catch {
+    toast.error('Failed to copy link');
+  }
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -21,8 +38,18 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0) // Track upload progress
   const [viewMode, setViewMode] = useState("grid")
+  const [section, setSection] = useState("mydrive")
   const [searchText, setSearchText] = useState("")
   const [profileOpen, setProfileOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(null)
+  const handleStar = async (file) => {
+    try {
+      const { updateDoc } = await import("firebase/firestore")
+      await updateDoc(doc(db, "files", file.id), { starred: !file.starred })
+      setUploadedFiles((prev) => prev.map(f => f.id === file.id ? { ...f, starred: !f.starred } : f))
+      toast.success(`${!file.starred ? "Starred" : "Unstarred"} ${file.name}`)
+    } catch (e) { toast.error("Failed to update star") }
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -74,8 +101,8 @@ export default function Dashboard() {
     const file = e.target.files?.[0]
     if (!file || !user) return
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(`File ${file.name} is too large (max 10MB)`)
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error(`File ${file.name} is too large (max 200MB)`)
       return
     }
 
@@ -162,9 +189,17 @@ export default function Dashboard() {
 
   const handleDelete = async (file) => {
     try {
-      await deleteDoc(doc(db, "files", file.id))
-      setUploadedFiles((prev) => prev.filter((f) => f.id !== file.id))
-      toast.success(`Deleted ${file.name}`)
+      if (section === "trash") {
+        await deleteDoc(doc(db, "files", file.id))
+        setUploadedFiles((prev) => prev.filter((f) => f.id !== file.id))
+        toast.success(`Permanently deleted ${file.name}`)
+      } else {
+        // Move to trash (soft delete)
+        const { updateDoc } = await import("firebase/firestore")
+        await updateDoc(doc(db, "files", file.id), { trashed: true })
+        setUploadedFiles((prev) => prev.map(f => f.id === file.id ? { ...f, trashed: true } : f))
+        toast.success(`Moved ${file.name} to Trash`)
+      }
     } catch (error) {
       toast.error("Failed to delete: " + error.message)
     }
@@ -186,10 +221,24 @@ export default function Dashboard() {
   const usedPercent = Math.min(100, Math.round((totalUsedBytes / storageLimitBytes) * 100))
 
   const filteredFiles = useMemo(() => {
-    if (!searchText) return uploadedFiles
+    let files = uploadedFiles
+    if (section === "shared") files = files.filter(f => f.sharedWith?.includes?.(user?.uid))
+    else if (section === "recent") files = files.filter(f=>!f.trashed).slice().sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt)).slice(0,20)
+    else if (section === "starred") files = files.filter(f => f.starred)
+    else if (section === "trash") files = files.filter(f => f.trashed)
+    else files = files.filter(f => !f.trashed)
+    if (!searchText) return files
     const s = searchText.toLowerCase()
-    return uploadedFiles.filter((f) => f.name?.toLowerCase().includes(s))
-  }, [uploadedFiles, searchText])
+    return files.filter((f) => f.name?.toLowerCase().includes(s))
+  }, [uploadedFiles, searchText, section, user?.uid])
+  const handleRestore = async (file) => {
+    try {
+      const { updateDoc } = await import("firebase/firestore")
+      await updateDoc(doc(db, "files", file.id), { trashed: false })
+      setUploadedFiles((prev) => prev.map(f => f.id === file.id ? { ...f, trashed: false } : f))
+      toast.success(`Restored ${file.name}`)
+    } catch (e) { toast.error("Failed to restore") }
+  }
 
   const displayName = user?.displayName || user?.email?.split("@")[0] || "User"
   const avatarLetter = displayName?.[0]?.toUpperCase?.() || "U"
@@ -260,11 +309,11 @@ export default function Dashboard() {
         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
         <nav className="sidebar-nav">
-          <button className="active-item">My Drive</button>
-          <button>Shared with me</button>
-          <button>Recent</button>
-          <button>Starred</button>
-          <button>Trash</button>
+          <button className={section==="mydrive"?"active-item":""} onClick={()=>setSection("mydrive")}>My Drive</button>
+          <button className={section==="shared"?"active-item":""} onClick={()=>setSection("shared")}>Shared with me</button>
+          <button className={section==="recent"?"active-item":""} onClick={()=>setSection("recent")}>Recent</button>
+          <button className={section==="starred"?"active-item":""} onClick={()=>setSection("starred")}>Starred</button>
+          <button className={section==="trash"?"active-item":""} onClick={()=>setSection("trash")}>Trash</button>
         </nav>
 
         <div className="storage">
@@ -278,7 +327,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="content">
         <div className="section-toolbar">
-          <h1>My Drive</h1>
+          <h1>{section==="mydrive"?"My Drive":section==="shared"?"Shared with me":section==="recent"?"Recent":section==="starred"?"Starred":"Trash"}</h1>
           <div className="tools">
             <button className="btn-secondary" onClick={handleCreateFolder}>+ New Folder</button>
             <button className="icon-btn" title="Filters"><FiSliders /></button>
@@ -295,7 +344,7 @@ export default function Dashboard() {
           {filteredFiles.length > 0 ? (
             <div className={`file-container ${viewMode}`}>
               {filteredFiles.map((file) => (
-                <div key={file.id} className="file-card">
+                <div key={file.id} className="file-card" style={{position:"relative"}}>
                   <div className="file-icon">
                     {file.isFolder || file.type === "folder" ? (
                       <FiFolder className="folder-icon" />
@@ -316,7 +365,36 @@ export default function Dashboard() {
                       {` • ${new Date(file.uploadedAt).toLocaleDateString()}`}
                     </p>
                   </div>
-                  <button className="delete" onClick={() => handleDelete(file)}>Delete</button>
+                  <button className="icon-btn" style={{position:"absolute",right:8,top:8}} onClick={()=>setMenuOpen(menuOpen===file.id?null:file.id)}><FiMoreVertical /></button>
+                  {menuOpen===file.id && (
+                    <div style={{position:"absolute",right:8,top:36,background:"#fff",border:"1px solid #eee",borderRadius:6,boxShadow:"0 2px 8px #0001",zIndex:2}}>
+                      {section === "trash" ? (
+                        <>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleRestore(file)}}>
+                            <FiStar color="#4caf50"/>Restore
+                          </button>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleDelete(file)}}>
+                            <FiTrash2 color="#e57373"/>Delete Permanently
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleShare(file)}}>
+                            <FiShare2 color="#43a047"/>Share
+                          </button>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleDownload(file)}}>
+                            <FiDownload color="#1976d2"/>Download
+                          </button>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleDelete(file)}}>
+                            <FiTrash2 color="#e57373"/>Delete
+                          </button>
+                          <button style={{display:"flex",alignItems:"center",gap:6,padding:6,border:0,background:"none",width:"100%"}} onClick={()=>{setMenuOpen(null);handleStar(file)}}>
+                            <FiStar color={file.starred?"#f7c948":"#bbb"}/>{file.starred?"Unstar":"Star"}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
